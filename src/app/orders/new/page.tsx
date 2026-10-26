@@ -44,7 +44,7 @@ export default function NewOrderPage() {
     Promise.all([
       fetch('/api/v1/customers').then((r) => r.json()),
       fetch('/api/v1/warehouses').then((r) => r.json()),
-      fetch('/api/v1/products').then((r) => r.json()),
+      fetch('/api/v1/products?pageSize=100').then((r) => r.json()),
     ])
       .then(([custRes, whRes, prodRes]) => {
         if (custRes.data) {

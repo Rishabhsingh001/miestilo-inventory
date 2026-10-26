@@ -12,7 +12,7 @@ const createProductSchema = z.object({
   name: z.string().min(1),
   categoryId: z.string().min(1),
   description: z.string().optional(),
-  brand: z.string().default('Misterio Lifestyle'),
+  brand: z.string().default('MiEstilo'),
   unit: z.string().default('PIECE'),
   reorderLevel: z.number().default(20),
   defaultSellingPriceMinor: z.number().min(0),
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     const q = searchParams.get('q');
     const categoryId = searchParams.get('categoryId');
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '25', 10)));
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10)));
 
     const filter: Record<string, unknown> = { isActive: true };
     if (categoryId) {

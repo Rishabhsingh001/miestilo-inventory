@@ -46,7 +46,7 @@ export default function AdjustmentsPage() {
           }
         }
       });
-    fetch('/api/v1/products')
+    fetch('/api/v1/products?pageSize=100')
       .then((r) => r.json())
       .then((res) => {
         if (res.data) {

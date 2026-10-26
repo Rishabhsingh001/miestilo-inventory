@@ -111,10 +111,10 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           <div>
             <h1 className="font-extrabold text-sm tracking-tight text-stone-900 leading-tight">
-              miestilo
+              MiEstilo
             </h1>
             <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest block">
-              Lifestyle Linen ERP
+              Luxury Bed & Bath Linen
             </span>
           </div>
         </div>
@@ -189,7 +189,7 @@ export function AppShell({ children }: AppShellProps) {
               <Menu className="w-5 h-5" />
             </button>
             <div className="hidden sm:flex items-center gap-2 text-xs text-stone-500">
-              <span className="font-semibold text-stone-800">miestilo Operations</span>
+              <span className="font-semibold text-stone-800">MiEstilo Operations</span>
               <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
               <span className="capitalize">{pathname.split('/')[1] || 'Dashboard'}</span>
             </div>
@@ -208,15 +208,15 @@ export function AppShell({ children }: AppShellProps) {
 
             {/* Role & User Badge */}
             <div className="flex items-center gap-2.5 pl-3 border-l border-stone-200">
-              <div className="w-8 h-8 rounded-full bg-lime-100 border border-lime-300 text-lime-900 font-bold text-xs flex items-center justify-center">
-                RS
+              <div className="w-8 h-8 rounded-full bg-[#171B18] text-[#A7F432] font-black text-xs flex items-center justify-center">
+                SK
               </div>
               <div className="hidden sm:block text-left">
                 <span className="text-xs font-semibold text-stone-900 block leading-tight">
-                  Rishabh Singh
+                  Sajid Khan
                 </span>
                 <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block">
-                  Super Admin
+                  Founder & MD
                 </span>
               </div>
             </div>
@@ -233,7 +233,7 @@ export function AppShell({ children }: AppShellProps) {
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-50">
               <div className="h-16 flex items-center justify-between px-6 border-b border-stone-200">
                 <span className="font-extrabold text-sm tracking-tight text-stone-900">
-                  miestilo Lifestyle
+                  MiEstilo Luxury Linen
                 </span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}

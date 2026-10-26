@@ -47,10 +47,10 @@ export default function LoginPage() {
             m
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">
-            miestilo
+            MiEstilo
           </h1>
           <p className="text-xs font-medium text-stone-500">
-            Luxury Linen Inventory & Order Management
+            Luxury Bed & Bath Linen ERP
           </p>
         </div>
 

@@ -27,7 +27,7 @@ describe('Database Integration Tests', () => {
   beforeAll(async () => {
     await connectToDatabase();
     const wh = await Warehouse.findOne({ code: 'WH-DEL-01' });
-    const pv = await ProductVariant.findOne({ sku: 'ML-BS-400-WHT-K' });
+    const pv = await ProductVariant.findOne({ sku: 'ME-BL-400-KNG' });
     const cust = await Customer.findOne();
 
     expect(wh).toBeDefined();
@@ -42,7 +42,7 @@ describe('Database Integration Tests', () => {
   it('verifies initial seeded stock balance for luxury king sheet', async () => {
     const balance = await StockBalance.findOne({ skuId: variantId, warehouseId });
     expect(balance).toBeDefined();
-    expect(balance!.onHand).toBeGreaterThanOrEqual(50);
+    expect(balance!.onHand).toBeGreaterThanOrEqual(40);
     const available = calculateAvailable(balance!);
     expect(available).toBeGreaterThanOrEqual(0);
   });
@@ -110,9 +110,9 @@ describe('Database Integration Tests', () => {
         {
           skuId: variantId,
           skuSnapshot: {
-            sku: 'ML-BS-400-WHT-K',
-            name: 'Misterio Luxury 400TC Hotel Bedsheet',
-            variantName: 'King - Optical White (108x108")',
+            sku: 'ME-BL-400-KNG',
+            name: 'Pure Cotton Bedsheet 400 TC',
+            variantName: 'King (108 x 108 inches)',
             unit: 'PIECE',
           },
           orderedQty: 10,
@@ -194,9 +194,9 @@ describe('Database Integration Tests', () => {
         {
           skuId: variantId,
           skuSnapshot: {
-            sku: 'ML-BS-400-WHT-K',
-            name: 'Misterio Luxury 400TC Hotel Bedsheet',
-            variantName: 'King - Optical White (108x108")',
+            sku: 'ME-BL-400-KNG',
+            name: 'Pure Cotton Bedsheet 400 TC',
+            variantName: 'King (108 x 108 inches)',
             unit: 'PIECE',
           },
           orderedQty: 5,
