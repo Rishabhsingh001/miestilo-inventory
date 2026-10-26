@@ -155,7 +155,6 @@ const SalesOrderSchema = new Schema<ISalesOrder>(
 
 SalesOrderSchema.index({ customerId: 1, orderDate: -1 });
 SalesOrderSchema.index({ status: 1, orderDate: -1 });
-SalesOrderSchema.index({ orderNumber: 1 }, { unique: true });
 
 export const SalesOrder =
   mongoose.models.SalesOrder || mongoose.model<ISalesOrder>('SalesOrder', SalesOrderSchema);

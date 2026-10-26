@@ -54,6 +54,5 @@ const ShipmentSchema = new Schema<IShipment>(
 );
 
 ShipmentSchema.index({ orderId: 1, dispatchDate: -1 });
-ShipmentSchema.index({ shipmentNumber: 1 }, { unique: true });
 
 export const Shipment = mongoose.models.Shipment || mongoose.model<IShipment>('Shipment', ShipmentSchema);

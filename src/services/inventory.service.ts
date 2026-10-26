@@ -46,7 +46,7 @@ export async function postReceipt(
         {
           $inc: { onHand: line.quantity, version: 1 },
         },
-        { upsert: true, new: true, session }
+        { upsert: true, returnDocument: 'after', session }
       );
 
       // 2. Create immutable StockMovement

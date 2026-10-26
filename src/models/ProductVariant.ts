@@ -50,7 +50,6 @@ const ProductVariantSchema = new Schema<IProductVariant>(
 );
 
 ProductVariantSchema.index({ productId: 1, isActive: 1 });
-ProductVariantSchema.index({ sku: 1 }, { unique: true });
 
 export const ProductVariant =
   mongoose.models.ProductVariant || mongoose.model<IProductVariant>('ProductVariant', ProductVariantSchema);

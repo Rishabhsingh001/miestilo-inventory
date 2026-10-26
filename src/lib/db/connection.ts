@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { env } from '@/lib/env';
+import '@/models';
 
 interface MongooseCache {
   conn: typeof mongoose | null;

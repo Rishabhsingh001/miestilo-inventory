@@ -18,7 +18,7 @@ export async function getNextSequence(key: string, prefix: string): Promise<stri
   const counter = await Counter.findOneAndUpdate(
     { key: fullKey },
     { $inc: { sequence: 1 } },
-    { new: true, upsert: true }
+    { returnDocument: 'after', upsert: true }
   );
   const padded = String(counter.sequence).padStart(6, '0');
   return `${prefix}-${year}-${padded}`;
