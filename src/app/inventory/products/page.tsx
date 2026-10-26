@@ -254,7 +254,7 @@ export default function ProductsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Misterio 500TC Jacquard Duvet Cover"
+                  placeholder="e.g. miestilo 500TC Jacquard Duvet Cover"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="input-field"

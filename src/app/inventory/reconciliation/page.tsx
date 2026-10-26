@@ -120,7 +120,7 @@ export default function ReconciliationPage() {
       <div className="card-surface p-5 bg-white space-y-2 text-xs text-stone-600">
         <h4 className="font-bold text-stone-900">Reconciliation Methodology</h4>
         <p>
-          Misterio Lifestyle enforces double-entry stock integrity: each posted inward receipt, sales shipment, warehouse transfer, or adjustment posts an immutable record in <code className="font-mono bg-stone-100 px-1 rounded">StockMovement</code>. This verification engine recalculates the full sum of all positive and negative deltas and confirms they match the fast-lookup <code className="font-mono bg-stone-100 px-1 rounded">StockBalance</code> projection.
+          miestilo Lifestyle enforces double-entry stock integrity: each posted inward receipt, sales shipment, warehouse transfer, or adjustment posts an immutable record in <code className="font-mono bg-stone-100 px-1 rounded">StockMovement</code>. This verification engine recalculates the full sum of all positive and negative deltas and confirms they match the fast-lookup <code className="font-mono bg-stone-100 px-1 rounded">StockBalance</code> projection.
         </p>
         <span className="text-[10px] text-stone-400 block pt-2">
           Last verified: {report?.reconciledAt ? new Date(report.reconciledAt).toLocaleString('en-IN') : 'Now'}

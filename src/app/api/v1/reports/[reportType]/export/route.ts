@@ -96,7 +96,7 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="misterio_${reportType}_${now}.csv"`,
+        'Content-Disposition': `attachment; filename="miestilo_${reportType}_${now}.csv"`,
       },
     });
   } catch (error) {

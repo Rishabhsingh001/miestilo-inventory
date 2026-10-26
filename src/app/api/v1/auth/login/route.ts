@@ -16,8 +16,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
 
-    await connectToDatabase();
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.toLowerCase();
+    const user = await User.findOne({
+      $or: [
+        { email: normalizedEmail },
+        { email: normalizedEmail.replace('@miestilo.com', '@misteriolifestyle.com') },
+        { email: normalizedEmail.replace('@misteriolifestyle.com', '@miestilo.com') },
+      ],
+    });
 
     if (!user || !user.isActive) {
       return errorResponse('INVALID_CREDENTIALS', 'Invalid email or password.', 401);

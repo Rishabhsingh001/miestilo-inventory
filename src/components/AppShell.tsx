@@ -101,20 +101,20 @@ export function AppShell({ children }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#F3F5F4] text-[#171B18]">
+    <div className="min-h-screen flex bg-[#F3F5F4] text-[#171B18] antialiased">
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-[#E7EBE7] shrink-0 sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-[#E7EBE7] shrink-0 sticky top-0 h-screen overflow-y-auto z-20 shadow-xs">
         {/* Brand Header */}
         <div className="h-16 flex items-center px-6 border-b border-[#E7EBE7] gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#171B18] flex items-center justify-center text-[#A7F432] font-bold text-lg shadow-sm">
-            M
+          <div className="w-8 h-8 rounded-xl bg-[#171B18] flex items-center justify-center text-[#A7F432] font-black text-base shadow-sm ring-1 ring-black/5">
+            m
           </div>
           <div>
-            <h1 className="font-bold text-sm tracking-tight text-stone-900 leading-tight">
-              MISTERIO
+            <h1 className="font-extrabold text-sm tracking-tight text-stone-900 leading-tight">
+              miestilo
             </h1>
             <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest block">
-              Lifestyle Linen
+              Lifestyle Linen ERP
             </span>
           </div>
         </div>
@@ -137,7 +137,7 @@ export function AppShell({ children }: AppShellProps) {
                       className={clsx(
                         'flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150',
                         isActive
-                          ? 'bg-[#F0FBD9] text-[#162402] font-semibold'
+                          ? 'bg-[#F0FBD9] text-[#162402] font-semibold shadow-2xs'
                           : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                       )}
                     >
@@ -180,7 +180,7 @@ export function AppShell({ children }: AppShellProps) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-[#E7EBE7] px-4 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+        <header className="h-16 bg-white border-b border-[#E7EBE7] px-4 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -189,7 +189,7 @@ export function AppShell({ children }: AppShellProps) {
               <Menu className="w-5 h-5" />
             </button>
             <div className="hidden sm:flex items-center gap-2 text-xs text-stone-500">
-              <span className="font-medium text-stone-800">Misterio Operations</span>
+              <span className="font-semibold text-stone-800">miestilo Operations</span>
               <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
               <span className="capitalize">{pathname.split('/')[1] || 'Dashboard'}</span>
             </div>
@@ -232,8 +232,8 @@ export function AppShell({ children }: AppShellProps) {
             />
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-50">
               <div className="h-16 flex items-center justify-between px-6 border-b border-stone-200">
-                <span className="font-bold text-sm tracking-tight text-stone-900">
-                  Misterio Lifestyle
+                <span className="font-extrabold text-sm tracking-tight text-stone-900">
+                  miestilo Lifestyle
                 </span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}

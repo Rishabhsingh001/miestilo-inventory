@@ -19,7 +19,7 @@ describe('Database Integration Tests', () => {
 
   const mockUser: SessionUser = {
     id: 'user-test-01',
-    email: 'admin@misteriolifestyle.com',
+    email: 'admin@miestilo.com',
     name: 'Aakash Verma',
     role: 'SUPER_ADMIN',
   };

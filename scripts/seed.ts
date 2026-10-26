@@ -36,35 +36,35 @@ export async function runSeed() {
   const users = await User.create([
     {
       name: 'Rishabh Singh (Owner)',
-      email: 'owner@misteriolifestyle.com',
+      email: 'owner@miestilo.com',
       passwordHash,
       role: 'SUPER_ADMIN',
       isActive: true,
     },
     {
       name: 'Aakash Verma (Operations)',
-      email: 'admin@misteriolifestyle.com',
+      email: 'admin@miestilo.com',
       passwordHash,
       role: 'ADMIN',
       isActive: true,
     },
     {
       name: 'Sunil Sharma (Inventory)',
-      email: 'inventory@misteriolifestyle.com',
+      email: 'inventory@miestilo.com',
       passwordHash,
       role: 'INVENTORY_MANAGER',
       isActive: true,
     },
     {
       name: 'Pooja Iyer (Sales)',
-      email: 'sales@misteriolifestyle.com',
+      email: 'sales@miestilo.com',
       passwordHash,
       role: 'SALES_MANAGER',
       isActive: true,
     },
     {
       name: 'Ramesh Patel (Warehouse)',
-      email: 'warehouse@misteriolifestyle.com',
+      email: 'warehouse@miestilo.com',
       passwordHash,
       role: 'WAREHOUSE_STAFF',
       isActive: true,
@@ -118,11 +118,11 @@ export async function runSeed() {
   // 1. 400TC Bedsheet
   const bedsheetCat = categories.find((c: any) => c.slug === 'bedsheets')!;
   const pBedsheet = await Product.create({
-    name: 'Misterio Luxury 400TC Hotel Bedsheet',
-    slug: 'misterio-luxury-400tc-bedsheet',
+    name: 'miestilo Luxury 400TC Hotel Bedsheet',
+    slug: 'miestilo-luxury-400tc-bedsheet',
     categoryId: bedsheetCat._id,
     description: '100% Egyptian Cotton Sateen weave, 400 Thread Count, silky smooth finish',
-    brand: 'Misterio Lifestyle',
+    brand: 'miestilo Lifestyle',
     unit: 'PIECE',
     reorderLevel: 25,
     defaultSellingPriceMinor: 219900, // Rs 2,199.00
@@ -162,11 +162,11 @@ export async function runSeed() {
   // 2. 600 GSM Towels
   const towelCat = categories.find((c: any) => c.slug === 'towels')!;
   const pTowel = await Product.create({
-    name: 'Misterio Royal 600 GSM Plush Bath Towel',
-    slug: 'misterio-royal-600-gsm-towel',
+    name: 'miestilo Royal 600 GSM Plush Bath Towel',
+    slug: 'miestilo-royal-600-gsm-towel',
     categoryId: towelCat._id,
     description: 'Zero-twist Turkish cotton 600 GSM bath towel designed for 5-star hospitality laundering cycles',
-    brand: 'Misterio Lifestyle',
+    brand: 'miestilo Lifestyle',
     unit: 'PIECE',
     reorderLevel: 40,
     defaultSellingPriceMinor: 89900,
@@ -206,11 +206,11 @@ export async function runSeed() {
   // 3. Duvet Inserts
   const duvetCat = categories.find((c: any) => c.slug === 'duvets')!;
   const pDuvet = await Product.create({
-    name: 'Misterio Cloud Microfiber Duvet Insert 350 GSM',
-    slug: 'misterio-cloud-microfiber-duvet',
+    name: 'miestilo Cloud Microfiber Duvet Insert 350 GSM',
+    slug: 'miestilo-cloud-microfiber-duvet',
     categoryId: duvetCat._id,
     description: 'Hypoallergenic hollow-fiber fill with boxed baffle-stitch construction',
-    brand: 'Misterio Lifestyle',
+    brand: 'miestilo Lifestyle',
     unit: 'PIECE',
     reorderLevel: 15,
     defaultSellingPriceMinor: 329900,

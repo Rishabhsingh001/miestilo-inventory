@@ -6,7 +6,7 @@ import { ShieldCheck, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('owner@misteriolifestyle.com');
+  const [email, setEmail] = useState('owner@miestilo.com');
   const [password, setPassword] = useState('Misterio@2026');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -43,14 +43,14 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-6">
         {/* Brand header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#171B18] text-[#A7F432] font-black text-2xl flex items-center justify-center mx-auto shadow-md">
-            M
+          <div className="w-12 h-12 rounded-2xl bg-[#171B18] text-[#A7F432] font-black text-2xl flex items-center justify-center mx-auto shadow-md ring-1 ring-black/10">
+            m
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-stone-900">
-            Misterio Lifestyle
+          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">
+            miestilo
           </h1>
-          <p className="text-xs text-stone-500">
-            Inventory & Order Management System
+          <p className="text-xs font-medium text-stone-500">
+            Luxury Linen Inventory & Order Management
           </p>
         </div>
 
@@ -114,35 +114,35 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <button
                 type="button"
-                onClick={() => handleQuickFill('owner@misteriolifestyle.com')}
-                className="p-2 rounded-lg bg-stone-50 hover:bg-lime-50 hover:border-lime-300 border border-stone-200 text-left transition-colors"
+                onClick={() => handleQuickFill('owner@miestilo.com')}
+                className="p-2.5 rounded-xl bg-stone-50 hover:bg-lime-50 hover:border-lime-400 border border-stone-200 text-left transition-all"
               >
-                <span className="font-semibold text-stone-900 block leading-tight">Super Admin</span>
-                <span className="text-[10px] text-stone-500">Full Access</span>
+                <span className="font-bold text-stone-900 block leading-tight">Super Admin</span>
+                <span className="text-[10px] text-stone-500">Full Operations Access</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('inventory@misteriolifestyle.com')}
-                className="p-2 rounded-lg bg-stone-50 hover:bg-lime-50 hover:border-lime-300 border border-stone-200 text-left transition-colors"
+                onClick={() => handleQuickFill('inventory@miestilo.com')}
+                className="p-2.5 rounded-xl bg-stone-50 hover:bg-lime-50 hover:border-lime-400 border border-stone-200 text-left transition-all"
               >
-                <span className="font-semibold text-stone-900 block leading-tight">Inventory Lead</span>
-                <span className="text-[10px] text-stone-500">Receipts & Adj</span>
+                <span className="font-bold text-stone-900 block leading-tight">Inventory Lead</span>
+                <span className="text-[10px] text-stone-500">Receipts & Stock Audit</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('sales@misteriolifestyle.com')}
-                className="p-2 rounded-lg bg-stone-50 hover:bg-lime-50 hover:border-lime-300 border border-stone-200 text-left transition-colors"
+                onClick={() => handleQuickFill('sales@miestilo.com')}
+                className="p-2.5 rounded-xl bg-stone-50 hover:bg-lime-50 hover:border-lime-400 border border-stone-200 text-left transition-all"
               >
-                <span className="font-semibold text-stone-900 block leading-tight">Sales Manager</span>
-                <span className="text-[10px] text-stone-500">Orders & Reserve</span>
+                <span className="font-bold text-stone-900 block leading-tight">Sales Manager</span>
+                <span className="text-[10px] text-stone-500">Orders & Reservations</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('warehouse@misteriolifestyle.com')}
-                className="p-2 rounded-lg bg-stone-50 hover:bg-lime-50 hover:border-lime-300 border border-stone-200 text-left transition-colors"
+                onClick={() => handleQuickFill('warehouse@miestilo.com')}
+                className="p-2.5 rounded-xl bg-stone-50 hover:bg-lime-50 hover:border-lime-400 border border-stone-200 text-left transition-all"
               >
-                <span className="font-semibold text-stone-900 block leading-tight">Warehouse Staff</span>
-                <span className="text-[10px] text-stone-500">Pick & Dispatch</span>
+                <span className="font-bold text-stone-900 block leading-tight">Warehouse Staff</span>
+                <span className="text-[10px] text-stone-500">Pick, Pack & Dispatch</span>
               </button>
             </div>
           </div>

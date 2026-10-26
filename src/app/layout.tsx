@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Misterio Lifestyle — Inventory & Order Management',
-  description: 'Enterprise inventory, warehouse operations, and sales order fulfillment system for hotel and hospitality linen.',
+  title: 'miestilo — Luxury Linen Inventory & Order Management',
+  description: 'Enterprise inventory, warehouse operations, and sales order fulfillment system for hotel and hospitality linen by miestilo.',
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ const envSchema = z.object({
   MONGODB_URI: z.string().default('mongodb://127.0.0.1:27017/misterio_inventory'),
   MONGODB_DB_NAME: z.string().default('misterio_inventory'),
   AUTH_SECRET: z.string().default('misterio-super-secret-inventory-jwt-key-32-chars-min'),
-  APP_NAME: z.string().default('Misterio Lifestyle Inventory'),
+  APP_NAME: z.string().default('miestilo Lifestyle Inventory'),
   DEFAULT_TIMEZONE: z.string().default('Asia/Kolkata'),
   DEFAULT_CURRENCY: z.string().default('INR'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

@@ -23,7 +23,7 @@ const ProductSchema = new Schema<IProduct>(
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     description: { type: String },
-    brand: { type: String, default: 'Misterio Lifestyle' },
+    brand: { type: String, default: 'miestilo Lifestyle' },
     unit: { type: String, default: 'PIECE' },
     imageUrls: [{ type: String }],
     reorderLevel: { type: Number, default: 20 },

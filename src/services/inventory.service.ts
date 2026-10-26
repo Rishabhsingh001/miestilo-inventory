@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { connectToDatabase, withTransaction } from '@/lib/db/connection';
 import { StockBalance, calculateAvailable } from '@/models/StockBalance';
 import { StockMovement, MovementType, ReferenceType } from '@/models/StockMovement';
-import { StockReceipt } from '@/models/StockReceipt';
+import { StockReceipt, IStockReceipt } from '@/models/StockReceipt';
 import { StockTransfer } from '@/models/StockTransfer';
 import { StockAdjustment } from '@/models/StockAdjustment';
 import { getNextSequence } from '@/models/Counter';
@@ -10,7 +10,7 @@ import { logAuditEvent } from '@/services/audit.service';
 import { SessionUser } from '@/lib/auth/session';
 
 export interface PostReceiptResult {
-  receipt: unknown;
+  receipt: IStockReceipt;
   movementsCount: number;
 }
 
