@@ -17,7 +17,6 @@ import {
   PlusCircle,
   Truck,
   RotateCcw,
-  Sparkles,
   Search,
   Menu,
   X,
@@ -25,11 +24,17 @@ import {
   SlidersHorizontal,
   ChevronRight,
   LogOut,
-  UserCheck
 } from 'lucide-react';
 
 interface AppShellProps {
   children: React.ReactNode;
+}
+
+interface CurrentUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const navSections = [
@@ -74,31 +79,46 @@ const navSections = [
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
-  const [seedMessage, setSeedMessage] = useState<string | null>(null);
-  const [currentRole, setCurrentRole] = useState<string>('SUPER_ADMIN');
+  const [user, setUser] = useState<CurrentUser | null>(null);
 
-  const handleQuickSeed = async () => {
+  // If on login page, render only the login view with no shell chrome
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/v1/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (mounted && data?.data) {
+          setUser(data.data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
+
+  const handleLogout = async () => {
     try {
-      setIsSeeding(true);
-      setSeedMessage(null);
-      const res = await fetch('/api/v1/seed', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        setSeedMessage('Demo linen inventory seeded successfully!');
-        setTimeout(() => {
-          setSeedMessage(null);
-          window.location.reload();
-        }, 1500);
-      } else {
-        setSeedMessage('Seed failed: ' + (data.error?.message || 'Error'));
-      }
-    } catch (err: any) {
-      setSeedMessage('Seed failed: ' + err.message);
-    } finally {
-      setIsSeeding(false);
+      await fetch('/api/v1/auth/me', { method: 'POST' });
+    } catch {
+      // Proceed with redirect regardless of network state
     }
+    window.location.href = '/login';
   };
+
+  const userInitials = user?.name
+    ? user.name
+        .split(' ')
+        .map((p) => p[0])
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'ME';
 
   return (
     <div className="min-h-screen flex bg-[#F3F5F4] text-[#171B18] antialiased">
@@ -159,21 +179,28 @@ export function AppShell({ children }: AppShellProps) {
           ))}
         </nav>
 
-        {/* Quick Seed & Demo Helper */}
-        <div className="p-4 border-t border-[#E7EBE7] bg-stone-50/50">
-          <button
-            onClick={handleQuickSeed}
-            disabled={isSeeding}
-            className="w-full btn-secondary text-xs py-2 bg-white flex items-center justify-center gap-2 shadow-xs hover:border-lime-400"
-          >
-            <Sparkles className={clsx('w-3.5 h-3.5 text-lime-600', isSeeding && 'animate-spin')} />
-            <span>{isSeeding ? 'Seeding Data...' : 'Reset Demo Inventory'}</span>
-          </button>
-          {seedMessage && (
-            <p className="mt-1.5 text-[11px] text-center font-medium text-emerald-700 bg-emerald-50 rounded py-1 px-2">
-              {seedMessage}
-            </p>
-          )}
+        {/* User Profile & Sign Out Footer */}
+        <div className="p-4 border-t border-[#E7EBE7] bg-stone-50/60">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#171B18] text-[#A7F432] font-black text-xs flex items-center justify-center shrink-0 shadow-xs ring-1 ring-black/5">
+              {userInitials}
+            </div>
+            <div className="min-w-0 flex-1 text-left">
+              <span className="text-xs font-bold text-stone-900 block truncate leading-tight">
+                {user?.name || 'Authorized Staff'}
+              </span>
+              <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block truncate">
+                {user?.role ? user.role.replace(/_/g, ' ') : 'Verified'}
+              </span>
+            </div>
+            <button
+              onClick={handleLogout}
+              title="Sign Out"
+              className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -207,18 +234,28 @@ export function AppShell({ children }: AppShellProps) {
             </div>
 
             {/* Role & User Badge */}
-            <div className="flex items-center gap-2.5 pl-3 border-l border-stone-200">
-              <div className="w-8 h-8 rounded-full bg-[#171B18] text-[#A7F432] font-black text-xs flex items-center justify-center">
-                SK
+            <div className="flex items-center gap-3 pl-3 border-l border-stone-200">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#171B18] text-[#A7F432] font-black text-xs flex items-center justify-center shadow-xs">
+                  {userInitials}
+                </div>
+                <div className="hidden sm:block text-left">
+                  <span className="text-xs font-semibold text-stone-900 block leading-tight">
+                    {user?.name || 'Authorized Staff'}
+                  </span>
+                  <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block">
+                    {user?.role ? user.role.replace(/_/g, ' ') : 'Operations'}
+                  </span>
+                </div>
               </div>
-              <div className="hidden sm:block text-left">
-                <span className="text-xs font-semibold text-stone-900 block leading-tight">
-                  Sajid Khan
-                </span>
-                <span className="text-[10px] font-medium text-stone-500 uppercase tracking-wider block">
-                  Founder & MD
-                </span>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-stone-600 hover:text-rose-600 hover:bg-rose-50 border border-stone-200 transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Sign Out</span>
+              </button>
             </div>
           </div>
         </header>
@@ -269,6 +306,17 @@ export function AppShell({ children }: AppShellProps) {
                   </div>
                 ))}
               </nav>
+
+              {/* Mobile Logout */}
+              <div className="p-4 border-t border-stone-200">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-stone-100 hover:bg-rose-50 hover:text-rose-700 text-xs font-bold text-stone-700 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
