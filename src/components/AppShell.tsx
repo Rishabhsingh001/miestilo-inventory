@@ -71,6 +71,12 @@ const navSections = [
     items: [
       { label: 'Reports & Export', href: '/reports', icon: FileText },
       { label: 'Reconciliation', href: '/inventory/reconciliation', icon: DatabaseZap },
+    ],
+  },
+  {
+    title: 'Administration',
+    items: [
+      { label: 'Team & Access', href: '/team', icon: Users },
       { label: 'Audit Trail', href: '/audit', icon: ShieldCheck },
     ],
   },

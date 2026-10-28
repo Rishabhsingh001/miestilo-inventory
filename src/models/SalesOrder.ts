@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export type OrderStatus =
   | 'DRAFT'
   | 'CONFIRMED'
+  | 'PACKED'
   | 'PICKING'
   | 'PARTIALLY_FULFILLED'
   | 'FULFILLED'
@@ -65,6 +66,14 @@ export interface ISalesOrder extends Document {
   taxTotalMinor: number;
   grandTotalMinor: number;
   notes?: string;
+  packingDetails?: {
+    packedAt?: Date;
+    packedBy?: string;
+    packageCount?: number;
+    grossWeightKg?: number;
+    sealNumbers?: string;
+    packingNotes?: string;
+  };
   idempotencyKey?: string;
   createdBy: string;
   confirmedBy?: string;
@@ -126,6 +135,7 @@ const SalesOrderSchema = new Schema<ISalesOrder>(
       enum: [
         'DRAFT',
         'CONFIRMED',
+        'PACKED',
         'PICKING',
         'PARTIALLY_FULFILLED',
         'FULFILLED',
@@ -142,6 +152,14 @@ const SalesOrderSchema = new Schema<ISalesOrder>(
     taxTotalMinor: { type: Number, default: 0 },
     grandTotalMinor: { type: Number, default: 0 },
     notes: { type: String },
+    packingDetails: {
+      packedAt: { type: Date },
+      packedBy: { type: String },
+      packageCount: { type: Number, default: 1 },
+      grossWeightKg: { type: Number },
+      sealNumbers: { type: String },
+      packingNotes: { type: String },
+    },
     idempotencyKey: { type: String, sparse: true, unique: true },
     createdBy: { type: String, required: true },
     confirmedBy: { type: String },

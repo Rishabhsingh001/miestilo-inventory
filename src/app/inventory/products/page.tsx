@@ -12,7 +12,8 @@ import {
   X,
   Layers,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Edit2
 } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
 
@@ -46,12 +47,34 @@ export default function ProductsPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Super Admin Edit Product states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingSubmitting, setEditingSubmitting] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    categoryId: '',
+    description: '',
+    unit: 'PIECE',
+    reorderLevel: 25,
+    defaultSellingPrice: 1999,
+    variants: [] as any[],
+  });
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/v1/categories');
-      const json = await res.json();
+      const [catRes, meRes] = await Promise.all([
+        fetch('/api/v1/categories'),
+        fetch('/api/v1/auth/me'),
+      ]);
+      const json = await catRes.json();
       if (json.data) setCategories(json.data);
+      if (meRes.ok) {
+        const meJson = await meRes.json();
+        setCurrentUser(meJson.data || null);
+      }
     } catch (err) {
       console.error('Failed to load categories', err);
     }
@@ -126,6 +149,81 @@ export default function ProductsPage() {
       setErrorMsg(err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const openEditModal = (p: any) => {
+    setEditingProduct(p);
+    setEditFormData({
+      name: p.name,
+      categoryId: p.categoryId?._id || p.categoryId || '',
+      description: p.description || '',
+      unit: p.unit || 'PIECE',
+      reorderLevel: p.reorderLevel || 20,
+      defaultSellingPrice: (p.defaultSellingPriceMinor || 0) / 100,
+      variants: (p.variants || []).map((v: any) => ({
+        _id: v._id,
+        sku: v.sku,
+        variantName: v.variantName,
+        size: v.attributes?.size || '',
+        color: v.attributes?.color || '',
+        fabric: v.attributes?.fabric || '',
+        gsm: v.attributes?.gsm || 0,
+        threadCount: v.attributes?.threadCount || 0,
+        sellingPrice: (v.sellingPriceMinor || 0) / 100,
+        cost: (v.costMinor || 0) / 100,
+        reorderLevel: v.reorderLevel || 20,
+      })),
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    try {
+      setEditingSubmitting(true);
+      setErrorMsg(null);
+
+      const payload = {
+        name: editFormData.name,
+        categoryId: editFormData.categoryId,
+        description: editFormData.description,
+        unit: editFormData.unit,
+        reorderLevel: Number(editFormData.reorderLevel),
+        defaultSellingPriceMinor: Math.round(Number(editFormData.defaultSellingPrice) * 100),
+        variants: editFormData.variants.map((v) => ({
+          _id: v._id,
+          sku: v.sku,
+          variantName: v.variantName,
+          size: v.size || undefined,
+          color: v.color || undefined,
+          fabric: v.fabric || undefined,
+          gsm: v.gsm ? Number(v.gsm) : undefined,
+          threadCount: v.threadCount ? Number(v.threadCount) : undefined,
+          sellingPriceMinor: Math.round(Number(v.sellingPrice) * 100),
+          costMinor: v.cost ? Math.round(Number(v.cost) * 100) : undefined,
+          reorderLevel: Number(v.reorderLevel),
+        })),
+      };
+
+      const res = await fetch(`/api/v1/products/${editingProduct._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || 'Failed to update product');
+      }
+
+      setEditModalOpen(false);
+      fetchProducts();
+    } catch (err: any) {
+      setErrorMsg(err.message);
+    } finally {
+      setEditingSubmitting(false);
     }
   };
 
@@ -270,6 +368,15 @@ export default function ProductsPage() {
                     <span className="text-[11px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full mt-1">
                       {p.variants?.length || 0} Sellable SKUs
                     </span>
+                    {currentUser?.role === 'SUPER_ADMIN' && (
+                      <button
+                        onClick={() => openEditModal(p)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-stone-800 bg-stone-100 hover:bg-[#171B18] hover:text-[#A7F432] transition-all mt-1.5 border border-stone-200"
+                      >
+                        <Edit2 className="w-3 h-3 text-stone-500" />
+                        <span>Edit Product</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -507,6 +614,159 @@ export default function ProductsPage() {
                   className="btn-primary text-xs"
                 >
                   {submitting ? 'Creating...' : 'Save Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Super Admin Edit Product Modal */}
+      {editModalOpen && editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-stone-200 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#171B18] text-[#A7F432] font-black text-xs flex items-center justify-center">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-stone-900">Edit Product & SKU Specifications</h3>
+                  <span className="text-[10px] text-stone-400">Super Admin Privilege</span>
+                </div>
+              </div>
+              <button onClick={() => setEditModalOpen(false)} className="text-stone-400 hover:text-stone-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditProduct} className="space-y-4 mt-4 text-xs">
+              <div>
+                <label className="font-semibold text-stone-700 block mb-1">Product Title</label>
+                <input
+                  type="text"
+                  required
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold text-stone-700 block mb-1">Category</label>
+                  <select
+                    value={editFormData.categoryId}
+                    onChange={(e) => setEditFormData({ ...editFormData, categoryId: e.target.value })}
+                    className="input-field"
+                  >
+                    {categories.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="font-semibold text-stone-700 block mb-1">Starting Selling Price (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={editFormData.defaultSellingPrice}
+                    onChange={(e) => setEditFormData({ ...editFormData, defaultSellingPrice: Number(e.target.value) })}
+                    className="input-field font-mono font-bold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold text-stone-700 block mb-1">Description & Hospitality Features</label>
+                <textarea
+                  rows={2}
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                  className="input-field text-xs"
+                />
+              </div>
+
+              {/* SKU Variants Pricing & Specs Editor */}
+              {editFormData.variants.length > 0 && (
+                <div className="space-y-3 pt-2 border-t border-stone-100">
+                  <span className="font-bold text-stone-800 uppercase tracking-wider text-[10px] block">
+                    SKU Variants Pricing & Specifications ({editFormData.variants.length} SKUs)
+                  </span>
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    {editFormData.variants.map((v, idx) => (
+                      <div key={v._id || idx} className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-xs text-stone-900">{v.sku}</span>
+                          <span className="text-[10px] font-medium text-stone-500">{v.variantName}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <label className="text-[10px] text-stone-500 font-semibold block mb-0.5">Selling Price (₹)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={v.sellingPrice}
+                              onChange={(e) => {
+                                const copy = [...editFormData.variants];
+                                copy[idx].sellingPrice = Number(e.target.value);
+                                setEditFormData({ ...editFormData, variants: copy });
+                              }}
+                              className="input-field font-mono font-bold text-xs py-1"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-stone-500 font-semibold block mb-0.5">Cost Price (₹)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={v.cost}
+                              onChange={(e) => {
+                                const copy = [...editFormData.variants];
+                                copy[idx].cost = Number(e.target.value);
+                                setEditFormData({ ...editFormData, variants: copy });
+                              }}
+                              className="input-field font-mono text-xs py-1"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-stone-500 font-semibold block mb-0.5">Min Reorder Qty</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={v.reorderLevel}
+                              onChange={(e) => {
+                                const copy = [...editFormData.variants];
+                                copy[idx].reorderLevel = Number(e.target.value);
+                                setEditFormData({ ...editFormData, variants: copy });
+                              }}
+                              className="input-field text-xs py-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-4 flex items-center justify-end gap-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className="btn-secondary text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editingSubmitting}
+                  className="btn-primary text-xs font-bold shadow-sm"
+                >
+                  {editingSubmitting ? 'Saving Changes...' : 'Save Product Changes'}
                 </button>
               </div>
             </form>

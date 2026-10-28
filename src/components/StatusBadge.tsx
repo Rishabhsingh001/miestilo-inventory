@@ -28,6 +28,11 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       Icon = CheckCircle2;
       label = 'Confirmed';
       break;
+    case 'PACKED':
+      colorClasses = 'bg-cyan-50 text-cyan-800 border-cyan-200 font-semibold';
+      Icon = PackageCheck;
+      label = 'Packed & Ready';
+      break;
     case 'PICKING':
       colorClasses = 'bg-purple-50 text-purple-700 border-purple-200';
       Icon = Boxes;

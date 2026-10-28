@@ -15,10 +15,14 @@ const PUBLIC_PATHS = [
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Pass through static assets and media
+  // Pass through static assets, PWA manifest, service worker and media
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico') ||
+    pathname.startsWith('/manifest.webmanifest') ||
+    pathname.startsWith('/sw.js') ||
+    pathname.startsWith('/icons') ||
+    pathname.startsWith('/apple-touch-icon') ||
     pathname.startsWith('/products') ||
     pathname.startsWith('/catalog')
   ) {
@@ -83,6 +87,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|products/|catalog/).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons/|apple-touch-icon.png|products/|catalog/).*)',
   ],
 };

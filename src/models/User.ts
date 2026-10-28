@@ -20,7 +20,7 @@ const UserSchema = new Schema<IUser>(
     role: {
       type: String,
       required: true,
-      enum: ['SUPER_ADMIN', 'ADMIN', 'INVENTORY_MANAGER', 'SALES_MANAGER', 'WAREHOUSE_STAFF', 'MANAGEMENT'],
+      enum: ['SUPER_ADMIN', 'ADMIN', 'ORDER_MANAGER', 'INVENTORY_MANAGER', 'SALES_MANAGER', 'WAREHOUSE_STAFF', 'MANAGEMENT'],
       default: 'SALES_MANAGER',
     },
     isActive: { type: Boolean, default: true },
