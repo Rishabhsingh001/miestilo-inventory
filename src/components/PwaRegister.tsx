@@ -80,9 +80,11 @@ export function PwaRegister() {
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full bg-[#171B18] text-white p-4 rounded-2xl shadow-2xl border border-stone-800 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#232924] text-[#A7F432] font-black text-lg flex items-center justify-center shrink-0 border border-stone-700">
-          m
-        </div>
+        <img
+          src="/brand/logo.png"
+          alt="MiEstilo"
+          className="w-10 h-10 rounded-xl object-contain bg-[#0E1528] p-0.5 border border-stone-700 shrink-0"
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <h4 className="font-bold text-xs text-white tracking-tight">Install MiEstilo App</h4>

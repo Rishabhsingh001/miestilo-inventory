@@ -132,9 +132,11 @@ export function AppShell({ children }: AppShellProps) {
       <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-[#E7EBE7] shrink-0 sticky top-0 h-screen overflow-y-auto z-20 shadow-xs">
         {/* Brand Header */}
         <div className="h-16 flex items-center px-6 border-b border-[#E7EBE7] gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#171B18] flex items-center justify-center text-[#A7F432] font-black text-base shadow-sm ring-1 ring-black/5">
-            m
-          </div>
+          <img
+            src="/brand/logo.png"
+            alt="MiEstilo Logo"
+            className="w-9 h-9 rounded-xl object-contain bg-[#0E1528] p-0.5 border border-stone-200/80 shadow-xs shrink-0"
+          />
           <div>
             <h1 className="font-extrabold text-sm tracking-tight text-stone-900 leading-tight">
               MiEstilo
@@ -221,10 +223,17 @@ export function AppShell({ children }: AppShellProps) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="hidden sm:flex items-center gap-2 text-xs text-stone-500">
-              <span className="font-semibold text-stone-800">MiEstilo Operations</span>
-              <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
-              <span className="capitalize">{pathname.split('/')[1] || 'Dashboard'}</span>
+            <div className="flex items-center gap-2">
+              <img
+                src="/brand/logo.png"
+                alt="MiEstilo"
+                className="w-7 h-7 rounded-lg object-contain bg-[#0E1528] p-0.5 border border-stone-200 shrink-0 lg:hidden"
+              />
+              <div className="hidden sm:flex items-center gap-2 text-xs text-stone-500">
+                <span className="font-semibold text-stone-800">MiEstilo Operations</span>
+                <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
+                <span className="capitalize">{pathname.split('/')[1] || 'Dashboard'}</span>
+              </div>
             </div>
           </div>
 
@@ -275,9 +284,16 @@ export function AppShell({ children }: AppShellProps) {
             />
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white z-50">
               <div className="h-16 flex items-center justify-between px-6 border-b border-stone-200">
-                <span className="font-extrabold text-sm tracking-tight text-stone-900">
-                  MiEstilo Luxury Linen
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/brand/logo.png"
+                    alt="MiEstilo"
+                    className="w-8 h-8 rounded-lg object-contain bg-[#0E1528] p-0.5 border border-stone-200 shrink-0"
+                  />
+                  <span className="font-extrabold text-sm tracking-tight text-stone-900">
+                    MiEstilo Luxury Linen
+                  </span>
+                </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-1.5 text-stone-500 hover:text-stone-800"

@@ -47,6 +47,7 @@ export interface ISalesOrder extends Document {
     contactName: string;
     email: string;
     phone: string;
+    taxId?: string;
   };
   shipToSnapshot: {
     street: string;
@@ -119,6 +120,7 @@ const SalesOrderSchema = new Schema<ISalesOrder>(
       contactName: { type: String, required: true },
       email: { type: String, required: true },
       phone: { type: String, required: true },
+      taxId: { type: String },
     },
     shipToSnapshot: {
       street: { type: String, required: true },

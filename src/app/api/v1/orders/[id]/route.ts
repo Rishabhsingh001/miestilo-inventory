@@ -13,6 +13,8 @@ const updateOrderSchema = z.object({
   notes: z.string().optional(),
   requiredDispatchDate: z.string().optional(),
   expectedDeliveryDate: z.string().optional(),
+  taxTotalMinor: z.number().int().min(0).optional(),
+  customerGstin: z.string().optional(),
   shipToSnapshot: z.object({
     street: z.string().min(1),
     city: z.string().min(1),
@@ -87,6 +89,16 @@ export async function PATCH(
     if (data.requiredDispatchDate) order.requiredDispatchDate = new Date(data.requiredDispatchDate);
     if (data.expectedDeliveryDate) order.expectedDeliveryDate = new Date(data.expectedDeliveryDate);
     if (data.shipToSnapshot) order.shipToSnapshot = data.shipToSnapshot;
+    if (data.taxTotalMinor !== undefined) {
+      order.taxTotalMinor = data.taxTotalMinor;
+      order.grandTotalMinor = order.subtotalMinor - order.discountTotalMinor + order.taxTotalMinor;
+    }
+    if (data.customerGstin !== undefined) {
+      order.customerSnapshot = {
+        ...order.customerSnapshot,
+        taxId: data.customerGstin.trim(),
+      };
+    }
 
     await order.save();
 

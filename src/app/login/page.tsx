@@ -128,16 +128,20 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F3F5F4] flex flex-col items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6">
         {/* Brand header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#171B18] text-[#A7F432] font-black text-2xl flex items-center justify-center mx-auto shadow-md ring-1 ring-black/10">
-            m
+        <div className="text-center space-y-3">
+          <img
+            src="/brand/logo.png"
+            alt="MiEstilo Logo"
+            className="w-20 h-20 rounded-2xl object-contain mx-auto shadow-lg border border-amber-300/30 bg-[#0E1528] p-1.5 ring-4 ring-amber-400/10"
+          />
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-stone-900">
+              MiEstilo
+            </h1>
+            <p className="text-xs font-medium text-stone-500 mt-0.5">
+              Hospitality Linen ERP & Inventory Operations
+            </p>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-stone-900">
-            MiEstilo
-          </h1>
-          <p className="text-xs font-medium text-stone-500">
-            Hospitality Linen ERP & Inventory Management
-          </p>
         </div>
 
         <Suspense fallback={<div className="card-surface p-8 bg-white text-center text-xs text-stone-400">Loading sign-in...</div>}>

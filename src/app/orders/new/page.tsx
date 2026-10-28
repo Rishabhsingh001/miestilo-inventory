@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
+  Receipt,
+  Calculator,
 } from 'lucide-react';
 
 export default function NewOrderPage() {
@@ -25,8 +27,14 @@ export default function NewOrderPage() {
 
   // Form State
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [customGstin, setCustomGstin] = useState('');
   const [selectedWarehouseId, setSelectedWarehouseId] = useState('');
   const [notes, setNotes] = useState('Hospitality partner delivery — handle linen with care.');
+  
+  // GST Manual Mode & Amount
+  const [gstMode, setGstMode] = useState<'LINE' | 'MANUAL'>('LINE');
+  const [manualGstRupees, setManualGstRupees] = useState<number>(0);
+
   const [lines, setLines] = useState<
     Array<{
       skuId: string;
@@ -49,7 +57,10 @@ export default function NewOrderPage() {
       .then(([custRes, whRes, prodRes]) => {
         if (custRes.data) {
           setCustomers(custRes.data);
-          if (custRes.data.length > 0) setSelectedCustomerId(custRes.data[0]._id);
+          if (custRes.data.length > 0) {
+            setSelectedCustomerId(custRes.data[0]._id);
+            setCustomGstin(custRes.data[0].taxId || '');
+          }
         }
         if (whRes.data) {
           setWarehouses(whRes.data);
@@ -79,6 +90,14 @@ export default function NewOrderPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleCustomerChange = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    const c = customers.find((cust) => cust._id === customerId);
+    if (c) {
+      setCustomGstin(c.taxId || '');
+    }
+  };
 
   const addLineItem = () => {
     if (availableSkus.length === 0) return;
@@ -120,14 +139,21 @@ export default function NewOrderPage() {
     0
   );
   const discountTotalMinor = lines.reduce((acc, l) => acc + l.discountMinor, 0);
-  const taxTotalMinor = lines.reduce(
+
+  const calculatedLineTaxMinor = lines.reduce(
     (acc, l) =>
       acc +
       Math.round(
-        ((l.orderedQty * l.unitPriceMinor - l.discountMinor) * l.taxRatePercent) / 100
+        ((l.orderedQty * l.unitPriceMinor - l.discountMinor) * (l.taxRatePercent || 0)) / 100
       ),
     0
   );
+
+  const taxTotalMinor =
+    gstMode === 'MANUAL'
+      ? Math.round(Number(manualGstRupees || 0) * 100)
+      : calculatedLineTaxMinor;
+
   const grandTotalMinor = subtotalMinor - discountTotalMinor + taxTotalMinor;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,10 +162,11 @@ export default function NewOrderPage() {
       setSubmitting(true);
       setErrorMsg(null);
 
-      const payload = {
+      const payload: any = {
         customerId: selectedCustomerId,
         warehouseId: selectedWarehouseId,
         notes,
+        customGstin: customGstin.trim(),
         lines: lines.map((l) => ({
           skuId: l.skuId,
           orderedQty: Number(l.orderedQty),
@@ -148,6 +175,10 @@ export default function NewOrderPage() {
           taxRatePercent: Number(l.taxRatePercent),
         })),
       };
+
+      if (gstMode === 'MANUAL') {
+        payload.manualTaxAmountMinor = taxTotalMinor;
+      }
 
       const res = await fetch('/api/v1/orders', {
         method: 'POST',
@@ -171,7 +202,7 @@ export default function NewOrderPage() {
   const selectedCustomer = customers.find((c) => c._id === selectedCustomerId);
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Back button and title */}
       <div className="flex items-center gap-3">
         <Link
@@ -185,7 +216,7 @@ export default function NewOrderPage() {
             Create Draft Sales Order
           </h1>
           <p className="text-xs text-stone-500 mt-0.5">
-            Draft orders do not reserve stock until explicitly confirmed by sales manager.
+            Configure hotel client, manual GST taxes, fulfillment warehouse, and luxury linen items.
           </p>
         </div>
       </div>
@@ -199,67 +230,85 @@ export default function NewOrderPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Customer & Warehouse Selection */}
-        <div className="card-surface p-6 bg-white space-y-4">
+        <div className="card-surface p-6 bg-white space-y-4 shadow-xs">
           <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400">
             1. Customer & Destination
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-stone-700 block mb-1">
-                Select Customer / Hotel
-              </label>
-              <select
-                required
-                value={selectedCustomerId}
-                onChange={(e) => setSelectedCustomerId(e.target.value)}
-                className="input-field cursor-pointer"
-              >
-                {customers.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.companyName} ({c.contactName})
-                  </option>
-                ))}
-              </select>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-stone-700 block mb-1">
+                  Select Customer / Hotel
+                </label>
+                <select
+                  required
+                  value={selectedCustomerId}
+                  onChange={(e) => handleCustomerChange(e.target.value)}
+                  className="input-field cursor-pointer"
+                >
+                  {customers.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.companyName} ({c.contactName})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {selectedCustomer && (
-                <div className="mt-2 p-2.5 rounded-lg bg-stone-50 text-[11px] text-stone-600 space-y-0.5 border border-stone-200">
-                  <span className="font-semibold text-stone-900 block">
-                    Ship-To Destination:
-                  </span>
-                  <span>{selectedCustomer.billingAddress}</span>
-                  {selectedCustomer.taxId && (
-                    <span className="block font-mono text-stone-400">
-                      GSTIN: {selectedCustomer.taxId}
+                <div className="p-3 rounded-xl bg-stone-50 text-[11px] text-stone-600 space-y-2 border border-stone-200">
+                  <div>
+                    <span className="font-semibold text-stone-900 block">
+                      Ship-To Address:
                     </span>
-                  )}
+                    <span>{selectedCustomer.billingAddress}</span>
+                  </div>
+
+                  {/* Manual GSTIN Field */}
+                  <div className="pt-2 border-t border-stone-200">
+                    <label className="font-semibold text-stone-700 block mb-1">
+                      Customer GSTIN / Tax ID (Manual Edit)
+                    </label>
+                    <input
+                      type="text"
+                      value={customGstin}
+                      onChange={(e) => setCustomGstin(e.target.value.toUpperCase())}
+                      placeholder="e.g. 27AAAAA0000A1Z5"
+                      className="input-field font-mono uppercase bg-white text-xs py-1"
+                    />
+                    <span className="text-[10px] text-stone-400 mt-0.5 block">
+                      Applied to commercial tax invoice for this order
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div>
-              <label className="text-xs font-medium text-stone-700 block mb-1">
-                Fulfillment Warehouse
-              </label>
-              <select
-                required
-                value={selectedWarehouseId}
-                onChange={(e) => setSelectedWarehouseId(e.target.value)}
-                className="input-field cursor-pointer"
-              >
-                {warehouses.map((w) => (
-                  <option key={w._id} value={w._id}>
-                    {w.name} ({w.city})
-                  </option>
-                ))}
-              </select>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-stone-700 block mb-1">
+                  Fulfillment Warehouse
+                </label>
+                <select
+                  required
+                  value={selectedWarehouseId}
+                  onChange={(e) => setSelectedWarehouseId(e.target.value)}
+                  className="input-field cursor-pointer"
+                >
+                  {warehouses.map((w) => (
+                    <option key={w._id} value={w._id}>
+                      {w.name} ({w.city})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <div className="mt-2">
+              <div>
                 <label className="text-xs font-medium text-stone-700 block mb-1">
                   Delivery / Order Notes
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="input-field text-xs"
@@ -270,18 +319,23 @@ export default function NewOrderPage() {
         </div>
 
         {/* Order Line Items */}
-        <div className="card-surface p-6 bg-white space-y-4">
+        <div className="card-surface p-6 bg-white space-y-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400">
-              2. Linen SKU Line Items
-            </h2>
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-stone-400">
+                2. Linen SKU Line Items & GST Rates
+              </h2>
+              <p className="text-[11px] text-stone-500 mt-0.5">
+                Set individual quantities, unit rates, and GST percentage tiers per product variant.
+              </p>
+            </div>
             <button
               type="button"
               onClick={addLineItem}
-              className="btn-secondary text-xs py-1 px-3"
+              className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Line Item</span>
+              <span>Add SKU Line</span>
             </button>
           </div>
 
@@ -289,7 +343,7 @@ export default function NewOrderPage() {
             {lines.map((line, idx) => {
               const itemSubtotal = line.orderedQty * line.unitPriceMinor;
               const itemTax = Math.round(
-                ((itemSubtotal - line.discountMinor) * line.taxRatePercent) / 100
+                ((itemSubtotal - line.discountMinor) * (line.taxRatePercent || 0)) / 100
               );
               const itemTotal = itemSubtotal - line.discountMinor + itemTax;
 
@@ -298,14 +352,14 @@ export default function NewOrderPage() {
                   key={idx}
                   className="p-3.5 rounded-xl bg-[#F8FAF8] border border-stone-200 grid grid-cols-1 md:grid-cols-12 gap-3 items-center text-xs"
                 >
-                  <div className="md:col-span-5">
+                  <div className="md:col-span-4">
                     <label className="text-[10px] text-stone-500 uppercase font-semibold block mb-1">
                       Linen SKU Variant
                     </label>
                     <select
                       value={line.skuId}
                       onChange={(e) => updateLine(idx, 'skuId', e.target.value)}
-                      className="input-field cursor-pointer font-mono font-medium"
+                      className="input-field cursor-pointer font-mono font-medium text-xs"
                     >
                       {availableSkus.map((s) => (
                         <option key={s._id} value={s._id}>
@@ -325,7 +379,7 @@ export default function NewOrderPage() {
                       required
                       value={line.orderedQty}
                       onChange={(e) => updateLine(idx, 'orderedQty', Number(e.target.value))}
-                      className="input-field font-mono font-bold"
+                      className="input-field font-mono font-bold text-xs"
                     />
                   </div>
 
@@ -340,23 +394,45 @@ export default function NewOrderPage() {
                       onChange={(e) =>
                         updateLine(idx, 'unitPriceMinor', Math.round(Number(e.target.value) * 100))
                       }
-                      className="input-field font-mono"
+                      className="input-field font-mono text-xs"
                     />
                   </div>
 
-                  <div className="md:col-span-2 text-right">
-                    <span className="text-[10px] text-stone-400 block">Line Total (+12% GST)</span>
-                    <span className="font-mono font-bold text-stone-900 text-sm block">
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] text-stone-500 uppercase font-semibold block mb-1">
+                      GST Rate Option
+                    </label>
+                    <select
+                      value={line.taxRatePercent}
+                      onChange={(e) => updateLine(idx, 'taxRatePercent', Number(e.target.value))}
+                      className="input-field text-xs font-semibold bg-white"
+                    >
+                      <option value={0}>0% (Tax Exempt)</option>
+                      <option value={5}>5% (Fabrics & Yarns)</option>
+                      <option value={12}>12% (Standard Linen)</option>
+                      <option value={18}>18% (Luxury Hospitality)</option>
+                      <option value={28}>28% (Special Goods)</option>
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-1.5 text-right">
+                    <span className="text-[10px] text-stone-400 block font-medium">
+                      Line Total
+                    </span>
+                    <span className="font-mono font-bold text-stone-900 text-xs block">
                       ₹{(itemTotal / 100).toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-[9px] text-stone-400 block font-mono">
+                      (+{line.taxRatePercent}% GST)
                     </span>
                   </div>
 
-                  <div className="md:col-span-1 text-right">
+                  <div className="md:col-span-0.5 text-right">
                     <button
                       type="button"
                       onClick={() => removeLineItem(idx)}
                       disabled={lines.length <= 1}
-                      className="p-1.5 text-stone-400 hover:text-rose-600 disabled:opacity-30"
+                      className="p-1.5 text-stone-400 hover:text-rose-600 disabled:opacity-30 cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -366,25 +442,104 @@ export default function NewOrderPage() {
             })}
           </div>
 
-          {/* Totals Summary */}
-          <div className="pt-4 border-t border-stone-100 flex flex-col items-end gap-1.5 text-xs">
-            <div className="flex justify-between w-64 text-stone-500">
-              <span>Subtotal:</span>
-              <span className="font-mono text-stone-800">
-                ₹{(subtotalMinor / 100).toLocaleString('en-IN')}
-              </span>
+          {/* GST Calculation Mode & Manual Override Options */}
+          <div className="pt-4 border-t border-stone-200/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <span className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                  <Receipt className="w-4 h-4 text-stone-700" />
+                  GST Tax Mode & Manual Options
+                </span>
+                <p className="text-[11px] text-stone-500 mt-0.5">
+                  Choose whether to auto-calculate tax from line item rates or enter a manual lump-sum GST amount.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-xl text-xs">
+                <button
+                  type="button"
+                  onClick={() => setGstMode('LINE')}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                    gstMode === 'LINE'
+                      ? 'bg-white text-stone-900 shadow-2xs'
+                      : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  Line-by-Line GST
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGstMode('MANUAL');
+                    if (manualGstRupees === 0) {
+                      setManualGstRupees(calculatedLineTaxMinor / 100);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                    gstMode === 'MANUAL'
+                      ? 'bg-[#171B18] text-[#A7F432] shadow-2xs'
+                      : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  Manual GST Amount (₹)
+                </button>
+              </div>
             </div>
-            <div className="flex justify-between w-64 text-stone-500">
-              <span>GST Tax (12%):</span>
-              <span className="font-mono text-stone-800">
-                ₹{(taxTotalMinor / 100).toLocaleString('en-IN')}
-              </span>
-            </div>
-            <div className="flex justify-between w-64 font-bold text-stone-900 text-sm pt-2 border-t border-stone-200">
-              <span>Grand Total:</span>
-              <span className="font-mono text-stone-950">
-                ₹{(grandTotalMinor / 100).toLocaleString('en-IN')}
-              </span>
+
+            {/* Manual GST Input when in MANUAL mode */}
+            {gstMode === 'MANUAL' && (
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-2 mb-4 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-xs text-amber-950 flex items-center gap-1.5">
+                    <Calculator className="w-4 h-4 text-amber-700" />
+                    Enter Custom Manual GST Tax Amount (₹)
+                  </label>
+                  <span className="text-[10px] font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                    Manual Mode Active
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative max-w-xs w-full">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold">₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={manualGstRupees}
+                      onChange={(e) => setManualGstRupees(Number(e.target.value))}
+                      className="input-field pl-7 font-mono font-bold text-sm bg-white"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <span className="text-xs text-amber-800">
+                    Auto calculated was: <span className="font-mono font-semibold">₹{(calculatedLineTaxMinor / 100).toLocaleString('en-IN')}</span>
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Totals Summary */}
+            <div className="flex flex-col items-end gap-1.5 text-xs">
+              <div className="flex justify-between w-72 text-stone-500">
+                <span>Subtotal (Linen Value):</span>
+                <span className="font-mono text-stone-800">
+                  ₹{(subtotalMinor / 100).toLocaleString('en-IN')}
+                </span>
+              </div>
+              <div className="flex justify-between w-72 text-stone-600 font-medium">
+                <span>
+                  GST Tax ({gstMode === 'MANUAL' ? 'Manual Override' : 'Calculated'}):
+                </span>
+                <span className="font-mono text-stone-900 font-bold">
+                  ₹{(taxTotalMinor / 100).toLocaleString('en-IN')}
+                </span>
+              </div>
+              <div className="flex justify-between w-72 font-black text-stone-950 text-sm pt-2 border-t border-stone-200">
+                <span>Grand Total:</span>
+                <span className="font-mono text-base">
+                  ₹{(grandTotalMinor / 100).toLocaleString('en-IN')}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -397,9 +552,9 @@ export default function NewOrderPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="btn-primary text-xs py-2 px-6 shadow-sm"
+            className="btn-primary text-xs font-bold shadow-sm"
           >
-            {submitting ? 'Creating Draft...' : 'Create Draft Order'}
+            {submitting ? 'Creating Sales Order...' : 'Create Draft Sales Order'}
           </button>
         </div>
       </form>

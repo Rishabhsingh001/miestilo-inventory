@@ -15,6 +15,8 @@ const orderSchema = z.object({
   requiredDispatchDate: z.string().optional(),
   expectedDeliveryDate: z.string().optional(),
   notes: z.string().optional(),
+  customGstin: z.string().optional(),
+  manualTaxAmountMinor: z.number().int().min(0).optional(),
   lines: z
     .array(
       z.object({
@@ -22,7 +24,7 @@ const orderSchema = z.object({
         orderedQty: z.number().int().min(1),
         unitPriceMinor: z.number().int().min(0),
         discountMinor: z.number().int().default(0),
-        taxRatePercent: z.number().default(12),
+        taxRatePercent: z.number().min(0).max(100).default(12),
       })
     )
     .min(1),
@@ -136,6 +138,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    if (data.manualTaxAmountMinor !== undefined) {
+      taxTotalMinor = data.manualTaxAmountMinor;
+    }
     const grandTotalMinor = subtotalMinor - discountTotalMinor + taxTotalMinor;
 
     const order = await SalesOrder.create({
@@ -147,6 +152,7 @@ export async function POST(req: NextRequest) {
         contactName: customer.contactName,
         email: customer.email,
         phone: customer.phone,
+        taxId: data.customGstin || customer.taxId || '',
       },
       shipToSnapshot: {
         street: defaultAddress.street,

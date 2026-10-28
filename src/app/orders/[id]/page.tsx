@@ -70,6 +70,8 @@ export default function OrderDetailPage() {
     city: '',
     state: '',
     postalCode: '',
+    taxTotalRupees: 0,
+    customerGstin: '',
   });
 
   // Cancel state
@@ -122,6 +124,8 @@ export default function OrderDetailPage() {
         city: ord.shipToSnapshot?.city || '',
         state: ord.shipToSnapshot?.state || '',
         postalCode: ord.shipToSnapshot?.postalCode || '',
+        taxTotalRupees: (ord.taxTotalMinor || 0) / 100,
+        customerGstin: ord.customerSnapshot?.taxId || '',
       });
 
       // Initialize dispatch form lines
@@ -255,6 +259,8 @@ export default function OrderDetailPage() {
           notes: editForm.notes,
           requiredDispatchDate: editForm.requiredDispatchDate || undefined,
           expectedDeliveryDate: editForm.expectedDeliveryDate || undefined,
+          taxTotalMinor: Math.round(Number(editForm.taxTotalRupees || 0) * 100),
+          customerGstin: editForm.customerGstin?.trim(),
           shipToSnapshot: {
             street: editForm.street,
             city: editForm.city,
@@ -503,9 +509,16 @@ export default function OrderDetailPage() {
           <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
             Customer & Delivery Details
           </span>
-          <h3 className="font-bold text-sm text-stone-900">
-            {order.customerSnapshot?.companyName}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-bold text-sm text-stone-900">
+              {order.customerSnapshot?.companyName}
+            </h3>
+            {order.customerSnapshot?.taxId && (
+              <span className="text-[10px] font-mono font-bold text-stone-700 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
+                GSTIN: {order.customerSnapshot.taxId}
+              </span>
+            )}
+          </div>
           <p className="text-xs text-stone-600">
             Attn: {order.customerSnapshot?.contactName} • {order.customerSnapshot?.phone}
           </p>
@@ -951,6 +964,46 @@ export default function OrderDetailPage() {
                       onChange={(e) => setEditForm({ ...editForm, postalCode: e.target.value })}
                       className="input-field"
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Manual GST Tax & GSTIN Controls (Super Admin) */}
+              <div className="space-y-2 pt-2 border-t border-stone-100">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                  Taxation & GST Manual Configuration
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold text-stone-700 block mb-1">
+                      GST Tax Amount (₹) (Manual Override)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={editForm.taxTotalRupees}
+                      onChange={(e) => setEditForm({ ...editForm, taxTotalRupees: Number(e.target.value) })}
+                      className="input-field font-mono font-bold"
+                    />
+                    <span className="text-[10px] text-stone-400 mt-0.5 block">
+                      Directly overrides GST tax and recalculates Grand Total
+                    </span>
+                  </div>
+                  <div>
+                    <label className="font-semibold text-stone-700 block mb-1">
+                      Customer GSTIN / Tax ID
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.customerGstin}
+                      onChange={(e) => setEditForm({ ...editForm, customerGstin: e.target.value.toUpperCase() })}
+                      placeholder="e.g. 27AAAAA0000A1Z5"
+                      className="input-field font-mono uppercase"
+                    />
+                    <span className="text-[10px] text-stone-400 mt-0.5 block">
+                      Appears on official invoice
+                    </span>
                   </div>
                 </div>
               </div>
