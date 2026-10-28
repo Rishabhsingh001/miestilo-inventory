@@ -288,8 +288,8 @@ export default function NewOrderPage() {
                 </div>
 
                 {/* Combobox Search Trigger Input */}
-                <div className="relative">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="flex items-center w-full bg-white border border-[#E7EBE7] focus-within:border-[#92DF20] focus-within:ring-2 focus-within:ring-[#A7F432]/30 rounded-[10px] px-3 py-2 text-xs transition-all shadow-2xs">
+                  <Search className="w-4 h-4 text-stone-400 shrink-0 mr-2.5 pointer-events-none" />
                   <input
                     type="text"
                     value={customerSearchText}
@@ -303,13 +303,13 @@ export default function NewOrderPage() {
                         ? `${selectedCustomer.companyName} (${selectedCustomer.contactName})`
                         : 'Type to search by hotel name, contact, city...'
                     }
-                    className="input-field pl-9 pr-8 text-xs font-medium bg-white focus:ring-2 focus:ring-[#A7F432]"
+                    className="w-full bg-transparent border-0 p-0 text-xs font-medium text-stone-900 outline-none placeholder:text-stone-400"
                   />
                   {customerSearchText ? (
                     <button
                       type="button"
                       onClick={() => setCustomerSearchText('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer"
+                      className="text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer shrink-0 ml-1.5"
                       title="Clear search text"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -318,7 +318,7 @@ export default function NewOrderPage() {
                     <button
                       type="button"
                       onClick={() => setCustomerDropdownOpen(!customerDropdownOpen)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer"
+                      className="text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer shrink-0 ml-1.5"
                     >
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-150 ${
@@ -648,15 +648,17 @@ export default function NewOrderPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="relative max-w-xs w-full">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold">₹</span>
+                  <div className="flex items-center max-w-xs w-full bg-white border border-[#E7EBE7] focus-within:border-[#92DF20] focus-within:ring-2 focus-within:ring-[#A7F432]/30 rounded-[10px] px-3 py-2 transition-all shadow-2xs">
+                    <span className="text-stone-500 font-bold font-mono text-sm shrink-0 mr-2 select-none">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={manualGstRupees}
                       onChange={(e) => setManualGstRupees(Number(e.target.value))}
-                      className="input-field pl-7 font-mono font-bold text-sm bg-white"
+                      className="w-full bg-transparent border-0 p-0 font-mono font-bold text-sm text-stone-900 outline-none"
                       placeholder="0.00"
                     />
                   </div>
