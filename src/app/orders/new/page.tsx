@@ -14,6 +14,9 @@ import {
   AlertCircle,
   Receipt,
   Calculator,
+  Search,
+  X,
+  ChevronDown,
 } from 'lucide-react';
 
 export default function NewOrderPage() {
@@ -30,6 +33,11 @@ export default function NewOrderPage() {
   const [customGstin, setCustomGstin] = useState('');
   const [selectedWarehouseId, setSelectedWarehouseId] = useState('');
   const [notes, setNotes] = useState('Hospitality partner delivery — handle linen with care.');
+
+  // Customer Search by text state
+  const [customerSearchText, setCustomerSearchText] = useState('');
+  const [customerDropdownOpen, setCustomerDropdownOpen] = useState(false);
+  const customerDropdownRef = React.useRef<HTMLDivElement>(null);
   
   // GST Manual Mode & Amount
   const [gstMode, setGstMode] = useState<'LINE' | 'MANUAL'>('LINE');
@@ -98,6 +106,38 @@ export default function NewOrderPage() {
       setCustomGstin(c.taxId || '');
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        customerDropdownRef.current &&
+        !customerDropdownRef.current.contains(event.target as Node)
+      ) {
+        setCustomerDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const filteredCustomers = customers.filter((c) => {
+    if (!customerSearchText.trim()) return true;
+    const q = customerSearchText.toLowerCase();
+    const company = c.companyName?.toLowerCase() || '';
+    const contact = c.contactName?.toLowerCase() || '';
+    const address = c.billingAddress?.toLowerCase() || '';
+    const taxId = c.taxId?.toLowerCase() || '';
+    const code = c.customerCode?.toLowerCase() || '';
+    return (
+      company.includes(q) ||
+      contact.includes(q) ||
+      address.includes(q) ||
+      taxId.includes(q) ||
+      code.includes(q)
+    );
+  });
 
   const addLineItem = () => {
     if (availableSkus.length === 0) return;
@@ -237,22 +277,131 @@ export default function NewOrderPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
-              <div>
-                <label className="text-xs font-medium text-stone-700 block mb-1">
-                  Select Customer / Hotel
-                </label>
-                <select
-                  required
-                  value={selectedCustomerId}
-                  onChange={(e) => handleCustomerChange(e.target.value)}
-                  className="input-field cursor-pointer"
-                >
-                  {customers.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.companyName} ({c.contactName})
-                    </option>
-                  ))}
-                </select>
+              <div className="relative" ref={customerDropdownRef}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-stone-700 block">
+                    Select Customer / Hotel
+                  </label>
+                  <span className="text-[10px] text-stone-400 font-medium">
+                    Search by hotel, contact, or city
+                  </span>
+                </div>
+
+                {/* Combobox Search Trigger Input */}
+                <div className="relative">
+                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={customerSearchText}
+                    onChange={(e) => {
+                      setCustomerSearchText(e.target.value);
+                      setCustomerDropdownOpen(true);
+                    }}
+                    onFocus={() => setCustomerDropdownOpen(true)}
+                    placeholder={
+                      selectedCustomer
+                        ? `${selectedCustomer.companyName} (${selectedCustomer.contactName})`
+                        : 'Type to search by hotel name, contact, city...'
+                    }
+                    className="input-field pl-9 pr-8 text-xs font-medium bg-white focus:ring-2 focus:ring-[#A7F432]"
+                  />
+                  {customerSearchText ? (
+                    <button
+                      type="button"
+                      onClick={() => setCustomerSearchText('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer"
+                      title="Clear search text"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setCustomerDropdownOpen(!customerDropdownOpen)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5 rounded cursor-pointer"
+                    >
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-150 ${
+                          customerDropdownOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                  )}
+                </div>
+
+                {/* Search Results Dropdown Menu */}
+                {customerDropdownOpen && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border border-stone-200 rounded-xl shadow-2xl max-h-64 overflow-y-auto divide-y divide-stone-100 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="p-2.5 bg-[#F8FAF8] border-b border-stone-200 text-[10px] text-stone-500 font-semibold uppercase tracking-wider flex justify-between items-center sticky top-0 z-10 backdrop-blur-xs">
+                      <span>{filteredCustomers.length} Hotel Partners Found</span>
+                      {customerSearchText && (
+                        <span className="text-[#366804] font-bold">
+                          Query: &quot;{customerSearchText}&quot;
+                        </span>
+                      )}
+                    </div>
+                    {filteredCustomers.length > 0 ? (
+                      filteredCustomers.map((c) => {
+                        const isSelected = c._id === selectedCustomerId;
+                        return (
+                          <button
+                            key={c._id}
+                            type="button"
+                            onClick={() => {
+                              handleCustomerChange(c._id);
+                              setCustomerSearchText('');
+                              setCustomerDropdownOpen(false);
+                            }}
+                            className={`w-full text-left p-3 hover:bg-stone-50 flex items-center justify-between transition-colors cursor-pointer ${
+                              isSelected ? 'bg-[#F0FBD9]' : ''
+                            }`}
+                          >
+                            <div className="min-w-0 pr-2">
+                              <span className="font-bold text-xs text-stone-900 block truncate">
+                                {c.companyName}
+                              </span>
+                              <span className="text-[11px] text-stone-500 block truncate">
+                                {c.contactName} {c.billingAddress ? `• ${c.billingAddress.split(',')[0]}` : ''}
+                              </span>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              {isSelected ? (
+                                <span className="text-[10px] font-bold text-[#162402] bg-[#A7F432] px-2 py-0.5 rounded-md shadow-2xs">
+                                  Selected
+                                </span>
+                              ) : c.taxId ? (
+                                <span className="text-[10px] font-mono text-stone-400">
+                                  {c.taxId}
+                                </span>
+                              ) : null}
+                            </div>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <div className="p-6 text-center text-xs text-stone-400 space-y-1">
+                        <p className="font-medium text-stone-600">No hotel partners found</p>
+                        <p className="text-[11px]">No client matches &quot;{customerSearchText}&quot;</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Quick Select Dropdown for direct pick */}
+                <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-stone-500">
+                  <span className="text-[10px] uppercase font-bold text-stone-400">Or pick from list:</span>
+                  <select
+                    value={selectedCustomerId}
+                    onChange={(e) => handleCustomerChange(e.target.value)}
+                    className="bg-transparent text-xs text-stone-700 font-medium underline underline-offset-2 hover:text-stone-900 cursor-pointer outline-none max-w-[260px] truncate"
+                  >
+                    {customers.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.companyName} ({c.contactName})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {selectedCustomer && (
